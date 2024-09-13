@@ -1,8 +1,16 @@
 using BackendProject.DependancyInjection;
 using BookingReminder.AppSettings;
 using BookingReminder.RedisCache;
+using NLog;
+using NLog.Web;
 
-var builder = WebApplication.CreateBuilder(args);
+
+var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+logger.Debug("Application starting...");
+
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.ReadConfigurationsFiles(builder.Configuration);
@@ -12,6 +20,12 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Configure NLog for ASP.NET Core
+builder.Logging.ClearProviders();
+    ILoggingBuilder loggingBuilder = builder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+builder.Host.UseNLog(); 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,3 +44,13 @@ app.MapControllers();
 
 await ConnectionHelper.Init(app.Services.GetRequiredService<IRedisConfig>());
 app.Run();
+}
+catch (Exception ex)
+{
+    logger.Error(ex, "Application stopped due to an exception");
+    throw;
+}
+finally
+{
+    NLog.LogManager.Shutdown();
+}

@@ -7,15 +7,23 @@ namespace BookingReminder.RedisCache
     {
         private readonly IConnectionMultiplexer _redis;
         private readonly IDatabase _database;
+        private readonly Logger<RedisCache> _logger;
 
-        public RedisCache()
-        {
-            try { 
-            this._database = ConnectionHelper.connection.GetDatabase();
+
+        public RedisCache(Logger<RedisCache> logger)
+        { 
+            _logger = logger;
+            try
+            {
+                if (ConnectionHelper.connection == null)
+                    throw new Exception("Redis connection is not initialized");
+
+                this._database = ConnectionHelper.connection.GetDatabase();
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.ToString());
+                _logger.LogError(ex.ToString());
+                throw new Exception();
             }
            
         }
@@ -30,8 +38,9 @@ namespace BookingReminder.RedisCache
                 bool result = await _database.StringSetAsync(key, value,time);
                 return ;
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex.ToString());
                 return ;
             }
         }
@@ -49,7 +58,7 @@ namespace BookingReminder.RedisCache
                 return JsonConvert.DeserializeObject<T>(value);
                 
             }
-            catch (RedisConnectionException ex)
+            catch (Exception ex)
             {
                 return new T();
             }
@@ -65,8 +74,9 @@ namespace BookingReminder.RedisCache
                 bool result = await _database.KeyDeleteAsync(key);
                 return ;
             }
-            catch 
+            catch (Exception ex)
             {
+                _logger.LogError(ex.ToString());
                 return;
             }
         }

@@ -11,31 +11,38 @@ namespace BookingReminder.Repositories
         private readonly ApplicationDbContext _context;
         private readonly IRedisCache _cache;
         private const string CacheKey = "UpcomingBookings";
+        private readonly Logger<UpcomingBooking> _logger;
 
-        public UpcomingBooking(ApplicationDbContext context, IRedisCache cache)
+        public UpcomingBooking(ApplicationDbContext context, IRedisCache cache, Logger<UpcomingBooking> logger)
         {
             _context = context;
             _cache = cache;
+            _logger = logger;
         }
 
         public async Task<List<Booking>> GetBookingsAsync() 
         {
             //we must implement the same logic if we have any changes on Booking table,
             //where we will use remove method
-
-            List<Booking> bookings = await _cache.GetDataAsync<List<Booking>>(CacheKey);
-            if (bookings ==null)
+            try
             {
-                bookings = await _context.Bookings
-                    .Include(b => b.Restaurant)
-                    .Include(b => b.User)
-                    .ToListAsync();
+                List<Booking> bookings = await _cache.GetDataAsync<List<Booking>>(CacheKey);
+                if (bookings == null)
+                {
+                    bookings = await _context.Bookings
+                        .Include(b => b.Restaurant)
+                        .Include(b => b.User)
+                        .ToListAsync();
 
-                var serializedData = JsonConvert.SerializeObject(bookings);
-                await _cache.SetDataAsync(CacheKey, serializedData, TimeSpan.FromHours(2));
+                    var serializedData = JsonConvert.SerializeObject(bookings);
+                    await _cache.SetDataAsync(CacheKey, serializedData, TimeSpan.FromHours(2));
+                }
+                return bookings;
             }
-
-            return bookings;
+            catch (Exception ex) {
+                _logger.LogError(ex.ToString());
+                return null;
+            }
         }
     }
 }

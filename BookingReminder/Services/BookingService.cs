@@ -9,37 +9,47 @@ namespace BackendProject.Services
     {
         private readonly List<RestaurantSetting> _restaurantSettings;
         private readonly IUpcomingBookingRepository _upcomingBooking;
+        private readonly Logger<BookingReminderService> _logger;
 
 
-        public BookingReminderService(List<RestaurantSetting> restaurantSettings, IUpcomingBookingRepository upcomingBooking)
+        public BookingReminderService(List<RestaurantSetting> restaurantSettings, IUpcomingBookingRepository upcomingBooking, Logger<BookingReminderService> logger)
         {
             _restaurantSettings = restaurantSettings;
             _upcomingBooking = upcomingBooking;
+            _logger = logger;
         }
 
         public async Task<List<string>> GetEmailsForUpcomingBookingsAsync(DateTime currentTime)
         {
-            var emails = new List<string>();
-
-            var bookings = await _upcomingBooking.GetBookingsAsync();
-            foreach (var booking in bookings)
+            try
             {
-                var restaurantSetting = _restaurantSettings
-                    .FirstOrDefault(rs => rs.RestaurantID == booking.RestaurantID);
+                var emails = new List<string>();
 
-                if (restaurantSetting != null)
+                var bookings = await _upcomingBooking.GetBookingsAsync();
+                foreach (var booking in bookings)
                 {
-                    var reminderTime = booking.BookingDate
-                        .AddMinutes(-restaurantSetting.BookingReminderMinutes);
+                    var restaurantSetting = _restaurantSettings
+                        .FirstOrDefault(rs => rs.RestaurantID == booking.RestaurantID);
 
-                    if (reminderTime <= currentTime)
+                    if (restaurantSetting != null)
                     {
-                        emails.Add(booking.User.Email);
+                        var reminderTime = booking.BookingDate
+                            .AddMinutes(-restaurantSetting.BookingReminderMinutes);
+
+                        if (reminderTime <= currentTime)
+                        {
+                            emails.Add(booking.User.Email);
+                        }
                     }
                 }
+                return emails;
             }
 
-            return emails;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return null;
+            }
         }
 
     }
