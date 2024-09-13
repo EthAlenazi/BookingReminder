@@ -1,5 +1,7 @@
 ﻿using BackendProject.Helpers;
 using BackendProject.Services;
+using BookingReminder.RedisCache;
+using BookingReminder.Repositories;
 
 namespace BackendProject.DependancyInjection
 {
@@ -7,17 +9,17 @@ namespace BackendProject.DependancyInjection
     {
         public static IServiceCollection AddCustomServicesInjecation(this IServiceCollection services, IConfiguration configuration)
         {
-
-            
+            services.AddScoped<UpcomingBooking>();
             services.AddScoped<BookingReminderService>();
-
 
             services.AddScoped<ReminderDelegate>(provider =>
             {
                 var reminderService = provider.GetRequiredService<BookingReminderService>();
-                return new ReminderDelegate(reminderService.GetEmailsForUpcomingBookings);
+                return new ReminderDelegate(async currentTime =>
+            await reminderService.GetEmailsForUpcomingBookingsAsync(currentTime));
             });
 
+            services.AddTransient<IRedisCache, RedisCache>();
             services.AddHostedService<BackgroundReminderService>();
 
             return services;

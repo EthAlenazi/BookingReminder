@@ -16,14 +16,14 @@ public class BackgroundReminderService : BackgroundService
             using (var scope = _serviceProvider.CreateScope())
             {
                 var reminderDelegate = scope.ServiceProvider.GetRequiredService<ReminderDelegate>();
-
-                // Now you can call the delegate
+                
                 var emails =  reminderDelegate(DateTime.Now);
 
-                // Process the emails (send reminders, etc.)
+  
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // 60 seconds delay
+            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // 60 seconds delay for test 
+         // await Task.Delay(TimeSpan.FromHours(1), stoppingToken); 
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using BackendProject.Models;
 using BackendProject.Settings;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 
 namespace BackendProject.DependancyInjection
 {
@@ -17,6 +17,14 @@ namespace BackendProject.DependancyInjection
             services.AddDbContext<ApplicationDbContext>(Options =>
                 Options.UseSqlServer(configuration.GetConnectionString("DataConnection")));
 
+            var redisConnectionString = configuration.GetConnectionString("Redis");
+
+            var options = ConfigurationOptions.Parse(redisConnectionString);
+            options.AbortOnConnectFail = false;
+            options.ConnectTimeout = 10000; // 
+            options.SyncTimeout = 10000; // 
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(options));
+           
             return services;
         }
     }

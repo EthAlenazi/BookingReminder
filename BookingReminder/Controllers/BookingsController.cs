@@ -15,9 +15,10 @@ namespace BackendProject.Controllers
         }
 
         [HttpGet("reminder-emails")]
-        public ActionResult<List<string>> GetReminderEmails([FromQuery] DateTime currentTime)
+        public async Task<IActionResult> GetReminderEmails()
         {
-            var emails = _reminderDelegate.Invoke(currentTime);
+            DateTime currentTime= DateTime.Now;
+            var emails = await _reminderDelegate.Invoke(currentTime);
 
             if (emails == null || emails.Count == 0)
             {

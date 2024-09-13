@@ -1,4 +1,5 @@
 ﻿namespace BackendProject.Helpers
 {
-    public delegate List<string> ReminderDelegate(DateTime currentTime);
+    public delegate Task<List<string>> ReminderDelegate(DateTime currentTime);
+
 }

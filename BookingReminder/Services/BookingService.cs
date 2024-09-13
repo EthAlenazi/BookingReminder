@@ -1,7 +1,7 @@
 ﻿using BackendProject.Models;
 using BackendProject.Settings;
-using Microsoft.EntityFrameworkCore;
-using System;
+using BookingReminder.RedisCache;
+using BookingReminder.Repositories;
 
 namespace BackendProject.Services
 {
@@ -9,21 +9,25 @@ namespace BackendProject.Services
     {
         private readonly List<RestaurantSetting> _restaurantSettings;
         private readonly ApplicationDbContext _context;
+        private readonly IRedisCache _cache;
+        private const string cacheKey = "UpcomingBookingsEmails";
+        private readonly UpcomingBooking _upcomingBooking;
 
-        public BookingReminderService(List<RestaurantSetting> restaurantSettings,ApplicationDbContext context)
+
+        public BookingReminderService(List<RestaurantSetting> restaurantSettings,ApplicationDbContext context,
+             IRedisCache cache, UpcomingBooking upcomingBooking)
         {
             _restaurantSettings = restaurantSettings;
             _context = context;
+            _cache = cache;
+            _upcomingBooking = upcomingBooking;
         }
 
-        public List<string> GetEmailsForUpcomingBookings(DateTime currentTime)
+        public async Task<List<string>> GetEmailsForUpcomingBookingsAsync(DateTime currentTime)
         {
             var emails = new List<string>();
 
-            
-            var bookings = _context.Bookings.Include(b => b.Restaurant)
-                                            .Include(b => b.User);
-
+            var bookings = await _upcomingBooking.GetBookingsAsync();
             foreach (var booking in bookings)
             {
                 var restaurantSetting = _restaurantSettings
@@ -43,7 +47,6 @@ namespace BackendProject.Services
 
             return emails;
         }
-
 
     }
 }
