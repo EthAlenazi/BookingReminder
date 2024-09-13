@@ -9,14 +9,14 @@ namespace BookingReminder.RedisCache
         private static Lazy<ConnectionMultiplexer> _redisConnection;
 
         private static IRedisConfig _redisConfig;
-        public static void Init(IRedisConfig redisConfig)
+        public static async Task Init(IRedisConfig redisConfig)
         {
             _redisConfig = redisConfig;
             try
             {
                 ConfigurationOptions configuration = new ConfigurationOptions
                 {
-                    EndPoints = { { _redisConfig.EndPoint, _redisConfig.Port } },
+                    EndPoints = { _redisConfig.EndPoint },
                     AbortOnConnectFail = _redisConfig.AbortOnConnectFail,
                     AsyncTimeout = _redisConfig.AsyncTimeout
 

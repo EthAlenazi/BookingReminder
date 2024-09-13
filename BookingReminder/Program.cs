@@ -1,13 +1,14 @@
 using BackendProject.DependancyInjection;
 using BookingReminder.RedisCache;
 using BookingReminder.Settings;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.ReadConfigurationsFiles(builder.Configuration);
 builder.Services.AddCustomServicesInjecation(builder.Configuration);
-
 
 builder.Services.AddControllers();
 
@@ -29,5 +30,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 
-ConnectionHelper.Init(app.Services.GetRequiredService<IRedisConfig>());
+await ConnectionHelper.Init(app.Services.GetRequiredService<IRedisConfig>());
 app.Run();

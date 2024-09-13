@@ -24,7 +24,7 @@ namespace BookingReminder.Repositories
             //where we will use remove method
 
             List<Booking> bookings = await _cache.GetDataAsync<List<Booking>>(CacheKey);
-            if (bookings == null)
+            if (bookings.Count<=0)
             {
                 bookings = await _context.Bookings
                     .Include(b => b.Restaurant)
