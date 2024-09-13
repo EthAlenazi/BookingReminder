@@ -3,9 +3,9 @@
 public class BackgroundReminderService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly Logger<BackgroundReminderService> _logger;
+    private readonly ILogger<BackgroundReminderService> _logger;
 
-    public BackgroundReminderService(IServiceProvider serviceProvider, Logger<BackgroundReminderService> logger)
+    public BackgroundReminderService(IServiceProvider serviceProvider, ILogger<BackgroundReminderService> logger)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;

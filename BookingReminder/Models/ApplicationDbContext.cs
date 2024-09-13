@@ -1,7 +1,5 @@
 ﻿using BackendProject.Models.Data;
-using BackendProject.Settings;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace BackendProject.Models
 {

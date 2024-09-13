@@ -7,10 +7,10 @@ namespace BookingReminder.RedisCache
     {
         private readonly IConnectionMultiplexer _redis;
         private readonly IDatabase _database;
-        private readonly Logger<RedisCache> _logger;
+        private readonly ILogger<RedisCache> _logger;
 
 
-        public RedisCache(Logger<RedisCache> logger)
+        public RedisCache(ILogger<RedisCache> logger)
         { 
             _logger = logger;
             try

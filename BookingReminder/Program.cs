@@ -11,12 +11,12 @@ logger.Debug("Application starting...");
 try
 {
     var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.ReadConfigurationsFiles(builder.Configuration);
+    //builder.Services.AddSingleton<Logger>(LogManager.GetCurrentClassLogger());
+    // Add services to the container.
+    builder.Services.ReadConfigurationsFiles(builder.Configuration);
 builder.Services.AddCustomServicesInjecation(builder.Configuration);
-
-builder.Services.AddControllers();
+    //builder.Services.AddSingleton<Logger>(LogManager.GetCurrentClassLogger());
+    builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

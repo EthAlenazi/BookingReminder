@@ -22,6 +22,7 @@ namespace BackendProject.DependancyInjection
 
             services.AddScoped<IRedisCache, RedisCache>();
             services.AddHostedService<BackgroundReminderService>();
+            services.AddSingleton<Logger>(LogManager.GetCurrentClassLogger());
 
             return services;
         }

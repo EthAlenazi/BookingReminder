@@ -11,9 +11,9 @@ namespace BookingReminder.Repositories
         private readonly ApplicationDbContext _context;
         private readonly IRedisCache _cache;
         private const string CacheKey = "UpcomingBookings";
-        private readonly Logger<UpcomingBooking> _logger;
+        private readonly ILogger<UpcomingBooking> _logger;
 
-        public UpcomingBooking(ApplicationDbContext context, IRedisCache cache, Logger<UpcomingBooking> logger)
+        public UpcomingBooking(ApplicationDbContext context, IRedisCache cache, ILogger<UpcomingBooking> logger)
         {
             _context = context;
             _cache = cache;
@@ -27,15 +27,18 @@ namespace BookingReminder.Repositories
             try
             {
                 List<Booking> bookings = await _cache.GetDataAsync<List<Booking>>(CacheKey);
-                if (bookings == null)
+                if (bookings.Count<1)
                 {
                     bookings = await _context.Bookings
                         .Include(b => b.Restaurant)
                         .Include(b => b.User)
                         .ToListAsync();
+                    //According to our theory, We can obtain all reservations for today alone,
+                    //but since each restaurant has a unique configuration,
+                    //we can also get updated data when any insert event.
 
-                    var serializedData = JsonConvert.SerializeObject(bookings);
-                    await _cache.SetDataAsync(CacheKey, serializedData, TimeSpan.FromHours(2));
+
+                    await _cache.SetDataAsync(CacheKey, bookings, TimeSpan.FromHours(2));
                 }
                 return bookings;
             }

@@ -9,10 +9,10 @@ namespace BackendProject.Services
     {
         private readonly List<RestaurantSetting> _restaurantSettings;
         private readonly IUpcomingBookingRepository _upcomingBooking;
-        private readonly Logger<BookingReminderService> _logger;
+        private readonly ILogger<BookingReminderService> _logger;
 
 
-        public BookingReminderService(List<RestaurantSetting> restaurantSettings, IUpcomingBookingRepository upcomingBooking, Logger<BookingReminderService> logger)
+        public BookingReminderService(List<RestaurantSetting> restaurantSettings, IUpcomingBookingRepository upcomingBooking, ILogger<BookingReminderService> logger)
         {
             _restaurantSettings = restaurantSettings;
             _upcomingBooking = upcomingBooking;
