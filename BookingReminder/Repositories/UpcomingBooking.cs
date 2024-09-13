@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace BookingReminder.Repositories
 {
-    public class UpcomingBooking
+    public class UpcomingBooking: IUpcomingBookingRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly IRedisCache _cache;
@@ -24,7 +24,7 @@ namespace BookingReminder.Repositories
             //where we will use remove method
 
             List<Booking> bookings = await _cache.GetDataAsync<List<Booking>>(CacheKey);
-            if (bookings.Count<=0)
+            if (bookings ==null)
             {
                 bookings = await _context.Bookings
                     .Include(b => b.Restaurant)

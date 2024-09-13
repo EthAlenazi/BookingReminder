@@ -1,8 +1,6 @@
 using BackendProject.DependancyInjection;
+using BookingReminder.AppSettings;
 using BookingReminder.RedisCache;
-using BookingReminder.Settings;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 

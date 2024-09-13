@@ -1,5 +1,4 @@
-﻿using BookingReminder.Settings;
-using Microsoft.Extensions.Options;
+﻿using BookingReminder.AppSettings;
 using StackExchange.Redis;
 
 namespace BookingReminder.RedisCache

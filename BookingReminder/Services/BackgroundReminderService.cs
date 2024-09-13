@@ -1,4 +1,4 @@
-﻿using BackendProject.Helpers;
+﻿using BackendProject.BackgroundJobs;
 
 public class BackgroundReminderService : BackgroundService
 {
@@ -17,13 +17,10 @@ public class BackgroundReminderService : BackgroundService
             {
                 var reminderDelegate = scope.ServiceProvider.GetRequiredService<ReminderDelegate>();
                 
-                var emails =  reminderDelegate(DateTime.Now);
-
-  
+                var emails = await reminderDelegate(DateTime.Now);
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // 60 seconds delay for test 
-         // await Task.Delay(TimeSpan.FromHours(1), stoppingToken); 
+           await Task.Delay(TimeSpan.FromHours(1), stoppingToken); 
         }
     }
 }

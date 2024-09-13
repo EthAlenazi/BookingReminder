@@ -1,4 +1,4 @@
-﻿namespace BackendProject.Settings
+﻿namespace BackendProject.AppSettings
 {
     public class RestaurantSetting
     {
@@ -8,8 +8,7 @@
     }
     public interface IRestaurantSetting
     {
-        public int RestaurantID { get; set; }
-        public int BookingReminderMinutes { get; set; }
-
+        int RestaurantID { get; }
+        int BookingReminderMinutes { get; }
     }
 }
