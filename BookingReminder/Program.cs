@@ -1,4 +1,6 @@
 using BackendProject.DependancyInjection;
+using BookingReminder.RedisCache;
+using BookingReminder.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,4 +28,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+
+ConnectionHelper.Init(app.Services.GetRequiredService<IRedisConfig>());
 app.Run();

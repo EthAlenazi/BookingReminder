@@ -2,8 +2,8 @@
 {
     public interface IRedisCache
     {
-        Task<bool> SetDataAsync(string key, string value, TimeSpan time);
-        Task<string> GetDataAsync(string key);
-        Task<bool> RemoveDataAsync(string key);
+        Task SetDataAsync<T>(string key, T data, TimeSpan time);
+        Task<T> GetDataAsync<T>(string key) where T : new();
+        Task RemoveDataAsync(string key);
     }
 }

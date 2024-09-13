@@ -18,13 +18,13 @@ namespace BookingReminder.Repositories
             _cache = cache;
         }
 
-        public async Task<List<Booking>> GetBookingsAsync()
+        public async Task<List<Booking>> GetBookingsAsync() 
         {
-            string cachedData = await _cache.GetDataAsync(CacheKey);
+            //we must implement the same logic if we have any changes on Booking table,
+            //where we will use remove method
 
-            List<Booking> bookings;
-
-            if (string.IsNullOrEmpty(cachedData))
+            List<Booking> bookings = await _cache.GetDataAsync<List<Booking>>(CacheKey);
+            if (bookings == null)
             {
                 bookings = await _context.Bookings
                     .Include(b => b.Restaurant)
@@ -33,10 +33,6 @@ namespace BookingReminder.Repositories
 
                 var serializedData = JsonConvert.SerializeObject(bookings);
                 await _cache.SetDataAsync(CacheKey, serializedData, TimeSpan.FromHours(2));
-            }
-            else
-            {
-                bookings = JsonConvert.DeserializeObject<List<Booking>>(cachedData);
             }
 
             return bookings;

@@ -1,73 +1,73 @@
-﻿using StackExchange.Redis;
+﻿using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace BookingReminder.RedisCache
 {
     public class RedisCache :IRedisCache
     {
         private readonly IConnectionMultiplexer _redis;
+        private readonly IDatabase _database;
 
-        public RedisCache(IConnectionMultiplexer redis)
+        public RedisCache()
         {
-            _redis = redis;
-        }
-
-        public async Task<bool> SetDataAsync(string key, string value, TimeSpan time)
-        {
-            try
-            {
-                var db = _redis.GetDatabase();
-                bool result = await db.StringSetAsync(key, value,time);
-                return result;
-            }
-            catch (RedisConnectionException ex)
-            {
-                Console.WriteLine($"Redis connection error: {ex.Message}");
-                return false;
+            try { 
+            this._database = ConnectionHelper.connection.GetDatabase();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while setting data: {ex.Message}");
-                return false;
+                throw new Exception(ex.ToString());
             }
+           
         }
 
-        public async Task<string> GetDataAsync(string key)
+        public async Task SetDataAsync<T>(string key, T data, TimeSpan time)
         {
             try
             {
-                var db = _redis.GetDatabase();
-                var value = await db.StringGetAsync(key);
-                return value.HasValue ? value.ToString() : "Key not found";
+                if (_database == null)
+                    return ;
+                string value = JsonConvert.SerializeObject(data);
+                bool result = await _database.StringSetAsync(key, value,time);
+                return ;
             }
-            catch (RedisConnectionException ex)
+            catch
             {
-                Console.WriteLine($"Redis connection error: {ex.Message}");
-                return "Error connecting to Redis";
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred while getting data: {ex.Message}");
-                return "Error retrieving data";
+                return ;
             }
         }
-
-        public async Task<bool> RemoveDataAsync(string key)
+        public async Task<T> GetDataAsync<T>(string key) where T :new()
         {
             try
             {
-                var db = _redis.GetDatabase();
-                bool result = await db.KeyDeleteAsync(key);
-                return result;
+                if (_database==null)
+                    return new T();
+
+                var value = await _database.StringGetAsync(key);
+                if (string.IsNullOrEmpty(value))
+                    return new T();
+
+                return JsonConvert.DeserializeObject<T>(value);
+                
             }
             catch (RedisConnectionException ex)
             {
-                Console.WriteLine($"Redis connection error: {ex.Message}");
-                return false;
+                return new T();
             }
-            catch (Exception ex)
+           
+        }
+        public async Task RemoveDataAsync(string key)
+        {
+            try
             {
-                Console.WriteLine($"An error occurred while removing data: {ex.Message}");
-                return false;
+                if (_database == null)
+                    return;
+
+                bool result = await _database.KeyDeleteAsync(key);
+                return ;
+            }
+            catch 
+            {
+                return;
             }
         }
     }

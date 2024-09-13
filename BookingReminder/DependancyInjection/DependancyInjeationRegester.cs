@@ -19,7 +19,7 @@ namespace BackendProject.DependancyInjection
             await reminderService.GetEmailsForUpcomingBookingsAsync(currentTime));
             });
 
-            services.AddTransient<IRedisCache, RedisCache>();
+            services.AddScoped<IRedisCache, RedisCache>();
             services.AddHostedService<BackgroundReminderService>();
 
             return services;
