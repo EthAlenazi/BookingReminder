@@ -11,12 +11,13 @@ namespace BackendProject.DependancyInjection
             
             services.AddScoped<BookingReminderService>();
 
-            
+
             services.AddScoped<ReminderDelegate>(provider =>
             {
                 var reminderService = provider.GetRequiredService<BookingReminderService>();
                 return new ReminderDelegate(reminderService.GetEmailsForUpcomingBookings);
             });
+
             services.AddHostedService<BackgroundReminderService>();
 
             return services;

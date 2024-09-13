@@ -1,45 +1,32 @@
 ﻿using BackendProject.Helpers;
 
-public class BackgroundReminderService : IHostedService, IDisposable
+public class BackgroundReminderService : BackgroundService
 {
-    private readonly ReminderDelegate _reminderDelegate;
-    private Timer _timer;
+    private readonly IServiceProvider _serviceProvider;
 
-    public BackgroundReminderService(ReminderDelegate reminderDelegate)
+    public BackgroundReminderService(IServiceProvider serviceProvider)
     {
-        _reminderDelegate = reminderDelegate;
+        _serviceProvider = serviceProvider;
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // Set the timer to execute every 60 seconds
-        _timer = new Timer(RunReminderLogic, null, TimeSpan.Zero, TimeSpan.FromSeconds(60));
-        return Task.CompletedTask;
-    }
-
-    private void RunReminderLogic(object state)
-    {
-        DateTime currentTime = DateTime.Now;
-        var emails = _reminderDelegate.Invoke(currentTime);
-
-       
-        Console.WriteLine("Emails to notify:");
-        foreach (var email in emails)
+        while (!stoppingToken.IsCancellationRequested)
         {
-            Console.WriteLine(email);
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var reminderDelegate = scope.ServiceProvider.GetRequiredService<ReminderDelegate>();
+
+                // Now you can call the delegate
+                var emails =  reminderDelegate(DateTime.Now);
+
+                // Process the emails (send reminders, etc.)
+            }
+
+            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // 60 seconds delay
         }
     }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        _timer?.Change(Timeout.Infinite, 0);
-        return Task.CompletedTask;
-    }
-
-    public void Dispose()
-    {
-        _timer?.Dispose();
-    }
 }
+
 
 
