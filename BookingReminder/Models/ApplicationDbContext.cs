@@ -9,7 +9,7 @@ namespace BackendProject.Models
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        public DbSet<Restaurant> Restaurants { get; set; }
+        public DbSet<Restaurant> Restaurants { get; set; } 
         public DbSet<User> Users { get; set; }
         public DbSet<Booking> Bookings { get; set; }
     }
